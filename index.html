@@ -10,7 +10,7 @@
   :root{ --tx:#c2541a; --grad:linear-gradient(155deg,#fff1df,#ffe2c6); }
   body{font-family:"PingFang TC","Noto Sans TC","Heiti TC",sans-serif;background:#ece6da;color:#1a1714;line-height:1.5;}
 
-  .app{display:grid;grid-template-columns:380px 1fr;min-height:100vh;}
+  .app{display:grid;grid-template-columns:380px 1fr;height:100dvh;}
   @media(max-width:900px){.app{grid-template-columns:1fr;}}
 
   /* ===== 控制面板 ===== */
@@ -61,6 +61,8 @@
   .btn.ghost:hover{border-color:#1a1714;}
   .btn.dark{background:#1a1714;color:#fff;}
   .btn.dark:hover{filter:brightness(1.15);}
+  .btn:disabled{opacity:.38;cursor:not-allowed;}
+  .btn:disabled:hover{border-color:#ddd6c6;filter:none;}
 
   /* ===== 預覽區 ===== */
   .stage{padding:36px 28px 60px;display:flex;flex-direction:column;align-items:center;gap:22px;overflow-y:auto;}
@@ -73,6 +75,10 @@
 
   .postWrap{display:flex;justify-content:center;}
 
+  /* ----- 預覽卡 + 右側九宮格並排 ----- */
+  .stageRow{display:flex;align-items:flex-start;justify-content:center;gap:36px;flex-wrap:wrap;width:100%;}
+  .refCol{display:flex;flex-direction:column;gap:14px;width:232px;flex:none;}
+
   /* ----- 貼文本體（C：emoji 大字 hero）｜尺寸用 em，靠 postInner 字級自動縮放 ----- */
   .post{position:relative;overflow:hidden;border-radius:26px;background:var(--grad);
     box-shadow:0 18px 48px rgba(26,23,20,.22);}
@@ -83,7 +89,9 @@
     padding:.4em .9em;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-top:.62em;}
   .ph{font-size:1.9em;font-weight:900;line-height:1.2;letter-spacing:-0.02em;margin-top:.55em;color:#1a1714;white-space:pre-line;}
   .ph em{font-style:normal;color:var(--tx);}
-  .plist{margin-top:auto;display:flex;flex-direction:column;gap:.56em;padding-top:1.05em;}
+  .pBody{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .pBodyInner{display:flex;flex-direction:column;}
+  .plist{display:flex;flex-direction:column;gap:.56em;padding-top:1.05em;}
   .prow{display:flex;gap:.69em;align-items:center;background:rgba(255,255,255,.62);
     border:1px solid rgba(255,255,255,.85);border-radius:.88em;padding:.62em .75em;}
   .prow .rpe{font-size:1.32em;flex:none;width:1.45em;text-align:center;}
@@ -94,14 +102,32 @@
   .pfoot .handle{font-size:.78em;font-weight:700;letter-spacing:.06em;color:#756b62;}
 
   /* ----- 九宮格參考 ----- */
-  .gridRef{width:300px;max-width:84vw;}
-  .gridRefLbl{font-size:12px;color:#8a8270;text-align:center;margin-bottom:10px;}
+  .gridRef{width:100%;}
+  .gridRefLbl{font-size:12px;color:#8a8270;text-align:left;margin-bottom:10px;line-height:1.4;}
   .grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:12px;overflow:hidden;}
   .gcell{aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;padding:8px;text-align:center;}
-  .gcell .ge{font-size:26px;line-height:1;}
-  .gcell .gt{font-size:10.5px;font-weight:900;line-height:1.12;}
+  .gcell .ge{font-size:24px;line-height:1;}
+  .gcell .gt{font-size:10px;font-weight:900;line-height:1.12;}
 
-  .hint{font-size:11.5px;color:#9a9081;text-align:center;max-width:340px;line-height:1.5;}
+  .hint{font-size:11.5px;color:#9a9081;text-align:left;line-height:1.55;}
+
+  /* ===== 圖片／文案分流提示 ===== */
+  .capDivider{border:none;border-top:1px solid #ddd6c6;margin:28px 0 0;}
+  .capNote{font-size:12px;color:#7a5a36;background:#fff6ec;border:1px solid #f0dcc4;border-radius:10px;padding:10px 12px;line-height:1.55;margin:14px 0 12px;}
+  .capNote b{color:#c2541a;font-weight:800;}
+  .liveTag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;color:#1f8f5f;background:#e6f6ec;border:1px solid #b9e3c8;border-radius:999px;padding:1px 8px;margin-left:7px;vertical-align:middle;}
+
+  /* ===== 手機：預覽釘在頂端、表單在下方捲動（桌機則靠 height:100dvh 左右各自捲動）===== */
+  @media(max-width:900px){
+    .app{display:flex;flex-direction:column;height:auto;}
+    .panel{order:2;overflow-y:visible;}
+    .stage{order:1;position:sticky;top:0;z-index:30;background:#ece6da;
+      max-height:56vh;overflow:hidden;padding:12px 14px 14px;gap:10px;
+      border-bottom:1px solid #d7d0c0;box-shadow:0 6px 16px rgba(26,23,20,.1);}
+    .stage .refCol{display:none;}                      /* 手機精簡：九宮格與提示移到桌機看 */
+    .post{width:auto !important;height:44vh !important;max-width:100% !important;}
+    .dlBtn{padding:9px 18px;font-size:13px;border-radius:10px;}
+  }
 </style>
 </head>
 <body>
@@ -138,8 +164,9 @@
     </div>
 
     <div class="blk">
-      <span class="lbl">標題</span>
-      <textarea class="ta" id="headline" rows="2" placeholder="用提問開場最容易被點開">大專生買 Mac，能省多少？三招</textarea>
+      <span class="lbl">標題<span class="liveTag">即時更新圖片</span></span>
+      <textarea class="ta" id="headline" rows="2" placeholder="建議按 Enter 分成兩行，圖上更好讀">大專生買 Mac，
+能省多少？三招</textarea>
       <div style="margin-top:9px;">
         <span class="fieldlbl">強調詞（會上主色，可留空）</span>
         <input class="inp" id="highlight" value="三招" placeholder="例：三招">
@@ -147,7 +174,7 @@
     </div>
 
     <div class="blk">
-      <span class="lbl">重點清單（1～4 點）</span>
+      <span class="lbl">重點清單（1～4 點）<span class="liveTag">即時更新圖片</span></span>
       <div id="points"></div>
       <button class="addBtn" id="addPoint">＋ 新增一點</button>
     </div>
@@ -160,14 +187,17 @@
       </div>
     </div>
 
+    <hr class="capDivider">
     <div class="blk capArea">
-      <span class="lbl">IG 文案（對演算法友善 · 可編輯）</span>
+      <span class="lbl">IG 文案（要貼到 IG 的文字 · 可編輯）</span>
+      <div class="capNote">這塊是<b>貼文文字</b>，跟右側圖片是分開的兩件事。<br>要改<b>圖片</b>內容，請回上面動「標題／強調詞／重點清單」（會即時反映到圖）；在這裡打字<b>不會改到圖片</b>。改完上面想同步文字，按「依上方重新產生」。</div>
       <span class="fieldlbl">開場句型（換個勾人方式，避免每篇同模子）</span>
       <div class="pills" id="hooks" style="margin-bottom:11px;"></div>
       <span class="fieldlbl">Hashtag（可自己加減 · 之後可月更新）</span>
       <input class="inp" id="tags" style="margin-bottom:11px;">
       <textarea class="ta" id="caption" rows="10"></textarea>
       <div class="capBtns">
+        <button class="btn ghost" id="undoCap" style="flex:0 0 auto;padding-left:15px;padding-right:15px;" title="退回文案上一個狀態">↩ 復原</button>
         <button class="btn ghost" id="regenCap">依上方重新產生</button>
         <button class="btn dark" id="copyCap">複製文案</button>
       </div>
@@ -180,15 +210,19 @@
       <button class="dlBtn" id="download">⬇ 下載 PNG（1080px）</button>
     </div>
 
-    <div class="postWrap">
-      <div class="post" id="post"></div>
-    </div>
+    <div class="stageRow">
+      <div class="postWrap">
+        <div class="post" id="post"></div>
+      </div>
 
-    <div class="gridRef">
-      <div class="gridRefLbl">首頁九宮格整體感（5 支柱配色節奏）</div>
-      <div class="grid9" id="grid9"></div>
+      <aside class="refCol">
+        <div class="gridRef">
+          <div class="gridRefLbl">首頁九宮格整體感（5 支柱配色節奏）</div>
+          <div class="grid9" id="grid9"></div>
+        </div>
+        <div class="hint">小技巧：同一支柱用同一個色，9 篇排起來自然成套。文案結尾的「分享給朋友」是觸及非粉絲的關鍵（IG 最看重私訊分享數）。</div>
+      </aside>
     </div>
-    <div class="hint">小技巧：同一支柱用同一個色，9 篇排起來自然成套。文案結尾的「分享給朋友」是觸及非粉絲的關鍵（IG 最看重私訊分享數）。</div>
   </main>
 </div>
 
@@ -203,7 +237,7 @@ var PILLARS = {
           hooks:{ask:'大專生買 Mac，到底能省多少？', pain:'結帳才發現沒帶證件，省錢方案就飛了。',
                  num:'3 個方法，買 Mac 直接省一筆。', time:'開學季就這檔，錯過等明年。', local:'高雄的同學注意，這樣買最划算。'},
           topics:[
-            {e:'🎓',t:'大專生買 Mac，能省多少？三招',hl:'三招',pts:[{e:'💸',t:'教育價直接折',s:'學生與教職員專屬價'},{e:'🎁',t:'檔期送 AppleCare',s:'開學季最划算'},{e:'💳',t:'分期 0 利率',s:'月付攤平更輕鬆'}]},
+            {e:'🎓',t:'大專生買 Mac，\n能省多少？三招',hl:'三招',pts:[{e:'💸',t:'教育價直接折',s:'學生與教職員專屬價'},{e:'🎁',t:'檔期送 AppleCare',s:'開學季最划算'},{e:'💳',t:'分期 0 利率',s:'月付攤平更輕鬆'}]},
             {e:'💰',t:'舊機換新機，\n折抵怎麼算？',hl:'折抵',pts:[{e:'📱',t:'舊機現場估價',s:'看狀況折抵新機'},{e:'✅',t:'資料安全轉移',s:'門市協助備份'},{e:'🔄',t:'當天換當天用',s:'不用等'}]},
             {e:'🎓',t:'iPhone 教育價，\n誰能買？',hl:'誰能買',pts:[{e:'🎓',t:'學生與教職員',s:'憑證件即享'},{e:'💻',t:'Mac 與 iPad 適用',s:'部分機型'},{e:'🎁',t:'常有加碼好禮',s:'問門市檔期'}]},
             {e:'🎓',t:'Mac 教育價，\n資格和限制',hl:'資格',pts:[{e:'🎓',t:'在學生與教職員',s:'憑學校證件'},{e:'📋',t:'部分機型適用',s:'每年有購買上限'},{e:'💳',t:'教育價也能分期',s:'問門市檔期'}]}
@@ -256,12 +290,12 @@ var PILLARS = {
 var PILLAR_ORDER = ['save','class','acc','film','daily'];
 
 /* ---------- 比例尺寸（顯示寬度；匯出固定 1080 寬） ---------- */
-var RATIOS = { '45':{w:384,h:480,base:16}, '916':{w:330,h:586,base:16.5}, '11':{w:400,h:400,base:16} };
+var RATIOS = { '45':{w:480,h:600,base:20}, '916':{w:420,h:746,base:20}, '11':{w:500,h:500,base:20} };
 
 /* ---------- 狀態 ---------- */
 var state = {
   pillar:'save', ratio:'45', topicIdx:0, hookStyle:'ask',
-  big:'🎓', headline:'大專生買 Mac，能省多少？三招', highlight:'三招',
+  big:'🎓', headline:'大專生買 Mac，\n能省多少？三招', highlight:'三招',
   points:[], store:'Apple Shop 高雄右昌蘋果店', handle:'@youchang.apple', tags:''
 };
 
@@ -294,27 +328,34 @@ function renderPost(){
   post.style.height = 'auto';
   post.innerHTML =
     '<div class="postInner" id="postInner">'+
-      '<span class="bigEmoji">'+esc(state.big)+'</span>'+
-      '<span class="ctag">'+esc(p.name)+'</span>'+
-      '<h2 class="ph">'+hl+'</h2>'+
-      '<div class="plist">'+rows+'</div>'+
+      '<div class="pBody" id="pBody">'+
+        '<div class="pBodyInner" id="pBodyInner">'+
+          '<span class="bigEmoji">'+esc(state.big)+'</span>'+
+          '<span class="ctag">'+esc(p.name)+'</span>'+
+          '<h2 class="ph">'+hl+'</h2>'+
+          '<div class="plist">'+rows+'</div>'+
+        '</div>'+
+      '</div>'+
       '<div class="pfoot"><span class="handle">'+esc(state.handle)+'</span></div>'+
     '</div>';
   fitPost();
 }
 
-/* ---------- 自動縮放：內容太多就縮字級，永遠塞滿不被切 ---------- */
+/* ---------- 自動填滿：字級放大填滿版面、太多則縮小，永遠不被切（9:16 不再小而稀疏） ---------- */
 function fitPost(){
-  var post=$('post'), inner=$('postInner');
-  if(!inner) return;
-  var H=post.clientHeight;
-  var base=RATIOS[state.ratio].base;
-  inner.style.fontSize=base+'px';
-  for(var i=0;i<12;i++){
-    var nat=inner.scrollHeight;
-    if(nat<=H+0.5) break;
-    base=base*(H/nat)*0.99;
-    inner.style.fontSize=base+'px';
+  var inner=$('postInner'), body=$('pBody'), content=$('pBodyInner');
+  if(!inner||!body||!content) return;
+  var min=RATIOS[state.ratio].base, max=min*1.6, size=min;
+  inner.style.fontSize=size+'px';
+  for(var i=0;i<24;i++){
+    var avail=body.clientHeight*0.95, nat=content.offsetHeight;
+    if(nat<=0) break;
+    var r=avail/nat;
+    if(r>0.99 && r<1.03) break;            // 已接近填滿
+    size=size*r;
+    if(size>max) size=max;
+    inner.style.fontSize=size+'px';
+    if(size>=max && r>1) break;            // 達上限仍想放大 → 停（保留留白）
   }
 }
 
@@ -355,7 +396,27 @@ function buildCaption(){
     '\n👀 覺得實用，分享給需要的朋友！'+
     '\n\n'+(state.tags||p.tags);
 }
-function regenCaption(){ $('caption').value = buildCaption(); }
+function regenCaption(){ $('caption').value = buildCaption(); snapCap(); }
+
+/* ---------- 文案復原（歷史堆疊） ---------- */
+var capStack=[], capTimer=null;
+function snapCap(){
+  var v=$('caption').value;
+  if(capStack.length===0 || capStack[capStack.length-1]!==v) capStack.push(v);
+  if(capStack.length>80) capStack.shift();
+  updateUndoBtn();
+}
+function undoCap(){
+  var cur=$('caption').value;
+  if(capStack.length && capStack[capStack.length-1]===cur) capStack.pop();
+  if(capStack.length) $('caption').value=capStack[capStack.length-1];
+  updateUndoBtn();
+}
+function updateUndoBtn(){
+  var b=$('undoCap'); if(!b) return;
+  var cur=$('caption').value;
+  b.disabled = !capStack.some(function(s){return s!==cur;});
+}
 
 /* ---------- 載入支柱 ---------- */
 function loadPillar(key){
@@ -492,6 +553,14 @@ function bind(){
     if(state.points.length<4){state.points.push({e:'✨',t:'',s:''});renderPoints();renderPost();}
   });
   $('regenCap').addEventListener('click',regenCaption);
+  $('undoCap').addEventListener('click',undoCap);
+  // 文案編輯：聚焦先記一筆、停手 0.6 秒記一筆，供「復原」一步步退回
+  $('caption').addEventListener('focus',snapCap);
+  $('caption').addEventListener('input',function(){
+    clearTimeout(capTimer);
+    capTimer=setTimeout(snapCap,600);
+    updateUndoBtn();
+  });
   $('copyCap').addEventListener('click',function(){
     var t=this; navigator.clipboard.writeText($('caption').value).then(function(){
       var o=t.textContent; t.textContent='已複製'; setTimeout(function(){t.textContent=o;},1400);
@@ -503,6 +572,8 @@ function bind(){
 /* ---------- 啟動 ---------- */
 bind();
 loadPillar('save');
+var fitTimer=null;
+window.addEventListener('resize',function(){ clearTimeout(fitTimer); fitTimer=setTimeout(fitPost,150); });
 </script>
 </body>
 </html>
