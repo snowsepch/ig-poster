@@ -125,7 +125,6 @@
       max-height:56vh;overflow:hidden;padding:12px 14px 14px;gap:10px;
       border-bottom:1px solid #d7d0c0;box-shadow:0 6px 16px rgba(26,23,20,.1);}
     .stage .refCol{display:none;}                      /* 手機精簡：九宮格與提示移到桌機看 */
-    .post{width:auto !important;height:44vh !important;max-width:100% !important;}
     .dlBtn{padding:9px 18px;font-size:13px;border-radius:10px;}
   }
 </style>
@@ -322,10 +321,17 @@ function renderPost(){
 
   var post = $('post');
   var r = RATIOS[state.ratio];
-  post.style.width = r.w+'px';
-  post.style.maxWidth = '100%';          // 手機：縮到螢幕寬
-  post.style.aspectRatio = r.w+' / '+r.h; // 保持比例（高度自動）
-  post.style.height = 'auto';
+  post.style.aspectRatio = r.w+' / '+r.h;
+  post.style.height = 'auto';                 // 高度一律由 aspect-ratio 決定
+  if(window.innerWidth<=900){
+    // 手機：以「釘頂帶高度」回推卡片寬度（不靠 CSS auto，避免 Safari 把寬度算成最小內容寬而塌掉）
+    var w = Math.min(window.innerHeight*0.44*(r.w/r.h), window.innerWidth*0.92);
+    post.style.width = w+'px';
+    post.style.maxWidth = '92vw';
+  } else {
+    post.style.width = r.w+'px';
+    post.style.maxWidth = '100%';
+  }
   post.innerHTML =
     '<div class="postInner" id="postInner">'+
       '<div class="pBody" id="pBody">'+
@@ -573,7 +579,7 @@ function bind(){
 bind();
 loadPillar('save');
 var fitTimer=null;
-window.addEventListener('resize',function(){ clearTimeout(fitTimer); fitTimer=setTimeout(fitPost,150); });
+window.addEventListener('resize',function(){ clearTimeout(fitTimer); fitTimer=setTimeout(renderPost,150); });
 </script>
 </body>
 </html>
