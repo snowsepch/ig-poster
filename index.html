@@ -117,15 +117,13 @@
   .capNote b{color:#c2541a;font-weight:800;}
   .liveTag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;color:#1f8f5f;background:#e6f6ec;border:1px solid #b9e3c8;border-radius:999px;padding:1px 8px;margin-left:7px;vertical-align:middle;}
 
-  /* ===== 手機：預覽釘在頂端、表單在下方捲動（桌機則靠 height:100dvh 左右各自捲動）===== */
+  /* ===== 手機：預覽在最上方、跟著頁面自然捲動（不釘住，避免網址列縮放讓比例跳動）===== */
   @media(max-width:900px){
     .app{display:flex;flex-direction:column;height:auto;}
     .panel{order:2;overflow-y:visible;}
-    .stage{order:1;position:sticky;top:0;z-index:30;background:#ece6da;
-      max-height:56vh;overflow:hidden;padding:12px 14px 14px;gap:10px;
-      border-bottom:1px solid #d7d0c0;box-shadow:0 6px 16px rgba(26,23,20,.1);}
+    .stage{order:1;overflow:visible;padding:16px 14px 22px;gap:14px;border-bottom:1px solid #d7d0c0;}
     .stage .refCol{display:none;}                      /* 手機精簡：九宮格與提示移到桌機看 */
-    .dlBtn{padding:9px 18px;font-size:13px;border-radius:10px;}
+    .dlBtn{padding:10px 20px;font-size:13px;border-radius:10px;}
   }
 </style>
 </head>
@@ -324,8 +322,8 @@ function renderPost(){
   post.style.aspectRatio = r.w+' / '+r.h;
   post.style.height = 'auto';                 // 高度一律由 aspect-ratio 決定
   if(window.innerWidth<=900){
-    // 手機：以「釘頂帶高度」回推卡片寬度（不靠 CSS auto，避免 Safari 把寬度算成最小內容寬而塌掉）
-    var w = Math.min(window.innerHeight*0.44*(r.w/r.h), window.innerWidth*0.92);
+    // 手機：以螢幕寬為準（寬度不隨網址列縮放跳動），高度由 aspect-ratio 決定，跟著頁面自然捲動
+    var w = Math.min(window.innerWidth*0.86, 440);
     post.style.width = w+'px';
     post.style.maxWidth = '92vw';
   } else {
