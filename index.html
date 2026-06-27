@@ -101,6 +101,32 @@
     border-top:1px solid rgba(0,0,0,.1);}
   .pfoot .handle{font-size:.78em;font-weight:700;letter-spacing:.06em;color:#756b62;}
 
+  /* ===== 版型切換（兩種模板共用同一套支柱配色，整組貼文才一致） ===== */
+  .tpls{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .tb{border:1.5px solid #ddd6c6;background:#fff;border-radius:10px;padding:11px 8px;cursor:pointer;text-align:center;transition:all .14s;}
+  .tb:hover{border-color:#b6ab92;}
+  .tb.on{border-color:#1a1714;background:#1a1714;color:#fff;}
+  .tb .tn{font-size:13px;font-weight:800;}
+  .tb .td{font-size:10px;opacity:.7;margin-top:2px;line-height:1.3;}
+
+  /* ===== 照片上傳區 ===== */
+  .photoBtns{display:flex;gap:8px;}
+  .photoBtns .btn{flex:1;}
+  .fileBtn{position:relative;overflow:hidden;text-align:center;display:inline-flex;align-items:center;justify-content:center;}
+  .fileBtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .photoState{font-size:11.5px;color:#7a7263;margin-top:9px;line-height:1.5;}
+  .photoState b{color:#2a241d;}
+
+  /* ----- 實拍照片版面（單純：照片填滿＋底部 @帳號，無其他文字） ----- */
+  .post.tpl-photo .postInner{padding:1.5em 1.45em 1.3em;}
+  .photoMedia{width:100%;flex:1;min-height:0;border-radius:1em;overflow:hidden;
+    background:#e5dece;position:relative;box-shadow:0 8px 20px rgba(0,0,0,.12);}
+  .photoMedia img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .photoEmpty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:.5em;color:#9b8f78;background:repeating-linear-gradient(45deg,#ece4d4,#ece4d4 12px,#e7dece 12px,#e7dece 24px);}
+  .photoEmpty .pe{font-size:2.1em;line-height:1;}
+  .photoEmpty span{font-size:.78em;font-weight:800;letter-spacing:.04em;}
+
   /* ----- 首頁格線參考（IG 桌面版＝4 欄 4:5 直式） ----- */
   .gridRef{width:100%;}
   .gridRefLbl{font-size:12px;color:#8a8270;text-align:left;margin-bottom:10px;line-height:1.4;}
@@ -133,7 +159,24 @@
   <!-- ========== 控制面板 ========== -->
   <aside class="panel">
     <h1>IG 貼文產生器</h1>
-    <div class="sub">右昌 Apple Shop · emoji 大字風格。選支柱、填內容、匯出 PNG，文案自動產生。</div>
+    <div class="sub">右昌 Apple Shop · 選版型、選支柱、填內容，匯出 PNG，文案自動產生。</div>
+
+    <div class="blk">
+      <span class="lbl">版型（兩種都共用同一套支柱配色，整組貼文才一致）</span>
+      <div class="tpls" id="tpls">
+        <div class="tb on" data-t="emoji"><div class="tn">emoji 大字</div><div class="td">純文字 · 不用照片</div></div>
+        <div class="tb" data-t="photo"><div class="tn">實拍照片</div><div class="td">上傳要曝光的照片</div></div>
+      </div>
+    </div>
+
+    <div class="blk" id="blkPhoto" style="display:none;">
+      <span class="lbl">要曝光的照片（固定 4:3 裁切，換哪張版面都一致）<span class="liveTag">即時更新圖片</span></span>
+      <div class="photoBtns">
+        <label class="btn ghost fileBtn">上傳照片<input type="file" id="photoFile" accept="image/*"></label>
+        <button class="btn ghost" id="photoClear">清除</button>
+      </div>
+      <div class="photoState" id="photoState"></div>
+    </div>
 
     <div class="blk">
       <span class="lbl">內容支柱（自動切配色與預設）</span>
@@ -154,7 +197,7 @@
       </div>
     </div>
 
-    <div class="blk">
+    <div class="blk" id="blkEmoji">
       <span class="lbl">大 emoji</span>
       <input class="inp" id="bigE" maxlength="4" value="🎓">
       <div class="emojiQuick" id="emojiQuick"></div>
@@ -180,7 +223,7 @@
       <span class="lbl">門市資訊</span>
       <div class="row2">
         <input class="inp" id="store" value="Apple Shop 高雄右昌蘋果店">
-        <input class="inp" id="handle" value="@youchang027tk">
+        <input class="inp" id="handle" value="@youchang.apple">
       </div>
       <input class="inp" id="addr" value="高雄市楠梓區德民路836號2樓" style="margin-top:9px;" placeholder="門市地址（會帶進文案）">
     </div>
@@ -303,16 +346,17 @@ var RATIOS = { '45':{w:480,h:600,base:20}, '916':{w:420,h:746,base:20}, '11':{w:
 
 /* ---------- 狀態 ---------- */
 var state = {
+  template:'emoji', photoData:'',
   pillar:'save', ratio:'45', topicIdx:0, hookStyle:'ask',
   big:'🎓', headline:'大專生買 Mac，\n能省多少？三招', highlight:'三招',
-  points:[], store:'Apple Shop 高雄右昌蘋果店', handle:'@youchang027tk', addr:'高雄市楠梓區德民路836號2樓', tags:''
+  points:[], store:'Apple Shop 高雄右昌蘋果店', handle:'@youchang.apple', addr:'高雄市楠梓區德民路836號2樓', tags:''
 };
 
 /* ---------- 工具 ---------- */
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function $(id){return document.getElementById(id);}
 
-/* ---------- 渲染貼文 ---------- */
+/* ---------- 渲染貼文（依版型切換內容，配色／尺寸共用） ---------- */
 function renderPost(){
   var p = PILLARS[state.pillar];
   document.documentElement.style.setProperty('--tx', p.tx);
@@ -330,6 +374,7 @@ function renderPost(){
   }).join('');
 
   var post = $('post');
+  post.classList.toggle('tpl-photo', state.template==='photo');
   var r = RATIOS[state.ratio];
   post.style.aspectRatio = r.w+' / '+r.h;
   post.style.height = 'auto';                 // 高度一律由 aspect-ratio 決定
@@ -342,18 +387,32 @@ function renderPost(){
     post.style.width = r.w+'px';
     post.style.maxWidth = '100%';
   }
-  post.innerHTML =
-    '<div class="postInner" id="postInner">'+
-      '<div class="pBody" id="pBody">'+
-        '<div class="pBodyInner" id="pBodyInner">'+
-          '<span class="bigEmoji">'+esc(state.big)+'</span>'+
-          '<span class="ctag">'+esc(p.name)+'</span>'+
-          '<h2 class="ph">'+hl+'</h2>'+
-          '<div class="plist">'+rows+'</div>'+
+
+  if(state.template==='photo'){
+    // 實拍模板：單純照片填滿＋底部 @帳號，不放其他文字
+    var photoInner = state.photoData
+      ? '<img alt="" src="'+state.photoData+'">'
+      : '<div class="photoEmpty"><span class="pe">📷</span><span>上傳要曝光的照片</span></div>';
+    post.innerHTML =
+      '<div class="postInner" id="postInner">'+
+        '<div class="photoMedia">'+photoInner+'</div>'+
+        '<div class="pfoot"><span class="handle">'+esc(state.handle)+'</span></div>'+
+      '</div>';
+    $('postInner').style.fontSize = RATIOS[state.ratio].base+'px';   // 帳號字級隨卡片比例縮放
+  } else {
+    post.innerHTML =
+      '<div class="postInner" id="postInner">'+
+        '<div class="pBody" id="pBody">'+
+          '<div class="pBodyInner" id="pBodyInner">'+
+            '<span class="bigEmoji">'+esc(state.big)+'</span>'+
+            '<span class="ctag">'+esc(p.name)+'</span>'+
+            '<h2 class="ph">'+hl+'</h2>'+
+            '<div class="plist">'+rows+'</div>'+
+          '</div>'+
         '</div>'+
-      '</div>'+
-      '<div class="pfoot"><span class="handle">'+esc(state.handle)+'</span></div>'+
-    '</div>';
+        '<div class="pfoot"><span class="handle">'+esc(state.handle)+'</span></div>'+
+      '</div>';
+  }
   fitPost();
 }
 
@@ -433,6 +492,24 @@ function updateUndoBtn(){
   var b=$('undoCap'); if(!b) return;
   var cur=$('caption').value;
   b.disabled = !capStack.some(function(s){return s!==cur;});
+}
+
+/* ---------- 版型切換（emoji 大字 / 實拍照片） ---------- */
+function loadTemplate(t){
+  state.template = t;
+  Array.prototype.forEach.call(document.querySelectorAll('#tpls .tb'),function(el){
+    el.classList.toggle('on', el.dataset.t===t);
+  });
+  $('blkPhoto').style.display = (t==='photo') ? '' : 'none';
+  $('blkEmoji').style.display = (t==='photo') ? 'none' : '';
+  updatePhotoState();
+  renderPost();
+}
+function updatePhotoState(){
+  var el=$('photoState'); if(!el) return;
+  el.innerHTML = state.photoData
+    ? '目前：<b>你上傳的照片</b>。已自動裁成 4:3，跟其他篇版面一致。'
+    : '還沒放照片：先按「上傳照片」放門市實拍或商品照，整張版面才會活起來。';
 }
 
 /* ---------- 載入支柱 ---------- */
@@ -528,7 +605,7 @@ function download(){
       var a=document.createElement('a');
       var d=new Date();
       var stamp=d.getFullYear()+''+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-      a.download='IG_'+PILLARS[state.pillar].name+'_'+state.ratio+'_'+stamp+'.png';
+      a.download='IG_'+(state.template==='photo'?'實拍_':'')+PILLARS[state.pillar].name+'_'+state.ratio+'_'+stamp+'.png';
       a.href=url; a.click();
       btn.classList.remove('busy'); btn.textContent=old;
     })
@@ -540,6 +617,21 @@ function download(){
 
 /* ---------- 綁定 ---------- */
 function bind(){
+  // 版型切換
+  Array.prototype.forEach.call(document.querySelectorAll('#tpls .tb'),function(el){
+    el.addEventListener('click',function(){ loadTemplate(el.dataset.t); });
+  });
+  // 照片上傳 / 清除
+  $('photoFile').addEventListener('change',function(){
+    var f=this.files&&this.files[0]; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ state.photoData=rd.result; updatePhotoState(); renderPost(); };
+    rd.readAsDataURL(f);
+    this.value='';
+  });
+  $('photoClear').addEventListener('click',function(){
+    state.photoData=''; updatePhotoState(); renderPost();
+  });
   // 支柱按鈕
   var pc=$('pillars');
   PILLAR_ORDER.forEach(function(k){
