@@ -75,9 +75,9 @@
 
   .postWrap{display:flex;justify-content:center;}
 
-  /* ----- 預覽卡 + 右側九宮格並排 ----- */
+  /* ----- 預覽卡 + 右側首頁格線參考並排 ----- */
   .stageRow{display:flex;align-items:flex-start;justify-content:center;gap:36px;flex-wrap:wrap;width:100%;}
-  .refCol{display:flex;flex-direction:column;gap:14px;width:232px;flex:none;}
+  .refCol{display:flex;flex-direction:column;gap:14px;width:264px;flex:none;}
 
   /* ----- 貼文本體（C：emoji 大字 hero）｜尺寸用 em，靠 postInner 字級自動縮放 ----- */
   .post{position:relative;overflow:hidden;border-radius:26px;background:var(--grad);
@@ -101,13 +101,13 @@
     border-top:1px solid rgba(0,0,0,.1);}
   .pfoot .handle{font-size:.78em;font-weight:700;letter-spacing:.06em;color:#756b62;}
 
-  /* ----- 九宮格參考 ----- */
+  /* ----- 首頁格線參考（IG 桌面版＝4 欄 4:5 直式） ----- */
   .gridRef{width:100%;}
   .gridRefLbl{font-size:12px;color:#8a8270;text-align:left;margin-bottom:10px;line-height:1.4;}
-  .grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:12px;overflow:hidden;}
-  .gcell{aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;padding:8px;text-align:center;}
-  .gcell .ge{font-size:24px;line-height:1;}
-  .gcell .gt{font-size:10px;font-weight:900;line-height:1.12;}
+  .grid9{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;border-radius:10px;overflow:hidden;}
+  .gcell{aspect-ratio:4/5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:5px;text-align:center;}
+  .gcell .ge{font-size:18px;line-height:1;}
+  .gcell .gt{font-size:8.5px;font-weight:900;line-height:1.12;}
 
   .hint{font-size:11.5px;color:#9a9081;text-align:left;line-height:1.55;}
 
@@ -122,7 +122,7 @@
     .app{display:flex;flex-direction:column;height:auto;}
     .panel{order:2;overflow-y:visible;}
     .stage{order:1;overflow:visible;padding:16px 14px 22px;gap:14px;border-bottom:1px solid #d7d0c0;}
-    .stage .refCol{display:none;}                      /* 手機精簡：九宮格與提示移到桌機看 */
+    .stage .refCol{display:none;}                      /* 手機精簡：格線參考與提示移到桌機看 */
     .dlBtn{padding:10px 20px;font-size:13px;border-radius:10px;}
   }
 </style>
@@ -214,7 +214,7 @@
 
       <aside class="refCol">
         <div class="gridRef">
-          <div class="gridRefLbl">首頁九宮格整體感（5 支柱配色節奏）</div>
+          <div class="gridRefLbl">首頁格線整體感（IG 桌面版＝4 欄直式，6 支柱配色節奏）</div>
           <div class="grid9" id="grid9"></div>
         </div>
         <div class="hint">小技巧：同一支柱用同一個色，9 篇排起來自然成套。文案結尾的「分享給朋友」是觸及非粉絲的關鍵（IG 最看重私訊分享數）。</div>
@@ -503,12 +503,11 @@ function renderEmojiQuick(){
   });
 }
 
-/* ---------- 九宮格參考 ---------- */
+/* ---------- 首頁格線參考（4 欄 4:5，8 格＝2 列×4，無空格） ---------- */
 function renderGrid9(){
   var cells=[
-    {k:'save', e:'🎓', t:'教育價'},{k:'class', e:'📸', t:'照片整理'},{k:'acc', e:'🔋', t:'電源挑選'},
-    {k:'film', e:'🛡️', t:'保護貼'},{k:'save', e:'💰', t:'舊換新'},{k:'daily', e:'🍎', t:'門市日常'},
-    {k:'class', e:'☁️', t:'iCloud'},{k:'acc', e:'🎧', t:'AirPods'},{k:'film', e:'✨', t:'霧或亮'}
+    {k:'save', e:'🎓', t:'教育價'},{k:'film', e:'🛡️', t:'保護貼'},{k:'acc', e:'🔋', t:'行動電源'},{k:'class', e:'📸', t:'照片整理'},
+    {k:'price', e:'💡', t:'聰明入手'},{k:'daily', e:'🍎', t:'門市日常'},{k:'acc', e:'🎧', t:'AirPods'},{k:'class', e:'☁️', t:'iCloud'}
   ];
   $('grid9').innerHTML = cells.map(function(c){
     var p=PILLARS[c.k];
