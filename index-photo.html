@@ -3,126 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>右昌 Apple Shop · IG 貼文產生器</title>
+<title>右昌 Apple Shop · IG 貼文產生器（拍照記憶版）</title>
 <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;}
-  :root{ --tx:#c2541a; --grad:linear-gradient(155deg,#fff1df,#ffe2c6); }
-  body{font-family:"PingFang TC","Noto Sans TC","Heiti TC",sans-serif;background:#ece6da;color:#1a1714;line-height:1.5;}
+  :root{ --tx:#c2541a; --grad:linear-gradient(155deg,#fff1df,#ffe2c6); --mk:rgba(194,84,26,.24); }
+  body{font-family:"PingFang TC","Noto Sans TC","Heiti TC",sans-serif;background:#e1dccf;color:#2a2636;line-height:1.5;}
 
   .app{display:grid;grid-template-columns:380px 1fr;height:100dvh;}
   @media(max-width:900px){.app{grid-template-columns:1fr;}}
 
   /* ===== 控制面板 ===== */
-  .panel{background:#fbfaf6;border-right:1px solid #ddd6c6;padding:24px 22px 48px;overflow-y:auto;}
-  @media(max-width:900px){.panel{border-right:none;border-bottom:1px solid #ddd6c6;padding:20px 16px 36px;}}
+  .panel{background:#f7f4ec;border-right:1px solid #d8d1c0;padding:24px 22px 48px;overflow-y:auto;}
+  @media(max-width:900px){.panel{border-right:none;border-bottom:1px solid #d8d1c0;padding:20px 16px 36px;}}
   .panel h1{font-size:19px;font-weight:800;letter-spacing:-0.01em;}
-  .panel .sub{font-size:12px;color:#8a8270;margin-top:5px;line-height:1.45;}
+  .panel .sub{font-size:12px;color:#857c6a;margin-top:5px;line-height:1.45;}
 
   .blk{margin-top:22px;}
-  .blk > .lbl{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:#8a8270;margin-bottom:9px;display:block;}
+  .blk > .lbl{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:#857c6a;margin-bottom:9px;display:block;}
 
   .pills{display:flex;flex-wrap:wrap;gap:7px;}
-  .pill{border:1.5px solid #ddd6c6;background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;color:#3a352c;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .14s;}
-  .pill:hover{border-color:#b6ab92;}
+  .pill{border:1.5px solid #d8d1c0;background:#fff;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;color:#3a352c;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .14s;}
+  .pill:hover{border-color:#b6ad96;}
   .pill.on{border-color:transparent;color:#fff;}
 
   .ratios{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .rb{border:1.5px solid #ddd6c6;background:#fff;border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .14s;}
-  .rb:hover{border-color:#b6ab92;}
-  .rb.on{border-color:#1a1714;background:#1a1714;color:#fff;}
+  .rb{border:1.5px solid #d8d1c0;background:#fff;border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .14s;}
+  .rb:hover{border-color:#b6ad96;}
+  .rb.on{border-color:#2a2636;background:#2a2636;color:#fff;}
   .rb .rn{font-size:13px;font-weight:800;}
   .rb .rd{font-size:10px;opacity:.7;margin-top:2px;}
 
-  .inp,.ta{width:100%;border:1.5px solid #ddd6c6;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;color:#1a1714;background:#fff;}
-  .inp:focus,.ta:focus{outline:none;border-color:#1a1714;}
+  .inp,.ta{width:100%;border:1.5px solid #d8d1c0;border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;color:#2a2636;background:#fff;}
+  .inp:focus,.ta:focus{outline:none;border-color:#2a2636;}
   .ta{resize:vertical;line-height:1.5;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .fieldlbl{font-size:12px;font-weight:700;color:#5a5346;margin-bottom:5px;display:block;}
 
   .emojiQuick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
-  .eq{font-size:20px;width:36px;height:36px;border:1.5px solid #e4ddcd;border-radius:9px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
-  .eq:hover{border-color:#1a1714;transform:translateY(-1px);}
+  .eq{font-size:20px;width:36px;height:36px;border:1.5px solid #e0d9c8;border-radius:9px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+  .eq:hover{border-color:#2a2636;transform:translateY(-1px);}
 
   .pointRow{display:grid;grid-template-columns:48px 1fr 30px;gap:7px;align-items:start;margin-bottom:8px;}
   .pointRow .pe{text-align:center;font-size:16px;padding:8px 0;}
   .pointRow .ptxt{display:flex;flex-direction:column;gap:6px;}
-  .pointRow .del{border:1.5px solid #e4ddcd;background:#fff;border-radius:8px;cursor:pointer;color:#b14a3a;font-weight:800;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;height:38px;}
+  .pointRow .del{border:1.5px solid #e0d9c8;background:#fff;border-radius:8px;cursor:pointer;color:#b14a3a;font-weight:800;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;height:38px;}
   .pointRow .del:hover{background:#fdeae6;border-color:#e0a193;}
-  .addBtn{width:100%;border:1.5px dashed #c9c0ac;background:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:700;color:#6b6354;cursor:pointer;}
-  .addBtn:hover{border-color:#1a1714;color:#1a1714;}
+  .addBtn{width:100%;border:1.5px dashed #c4baa2;background:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:700;color:#6b6354;cursor:pointer;}
+  .addBtn:hover{border-color:#2a2636;color:#2a2636;}
   .addBtn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .photoBtns{display:flex;gap:8px;}
+  .photoBtns .btn{flex:1;}
+  .fileBtn{display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .fileBtn input{display:none;}
+  .photoState{font-size:11.5px;color:#7a7263;margin-top:8px;line-height:1.5;}
+  .photoState b{color:#2a2636;}
 
   .capArea{position:relative;}
   .capBtns{display:flex;gap:8px;margin-top:9px;}
   .btn{border:none;border-radius:9px;padding:10px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .1s,filter .15s;flex:1;}
   .btn:active{transform:translateY(1px);}
-  .btn.ghost{background:#fff;border:1.5px solid #ddd6c6;color:#3a352c;}
-  .btn.ghost:hover{border-color:#1a1714;}
-  .btn.dark{background:#1a1714;color:#fff;}
+  .btn.ghost{background:#fff;border:1.5px solid #d8d1c0;color:#3a352c;}
+  .btn.ghost:hover{border-color:#2a2636;}
+  .btn.dark{background:#2a2636;color:#fff;}
   .btn.dark:hover{filter:brightness(1.15);}
   .btn:disabled{opacity:.38;cursor:not-allowed;}
-  .btn:disabled:hover{border-color:#ddd6c6;filter:none;}
+  .btn:disabled:hover{border-color:#d8d1c0;filter:none;}
 
   /* ===== 預覽區 ===== */
   .stage{padding:36px 28px 60px;display:flex;flex-direction:column;align-items:center;gap:22px;overflow-y:auto;}
   @media(max-width:900px){.stage{padding:22px 14px 56px;}}
   .stageBar{display:flex;gap:10px;align-items:center;}
-  .dlBtn{background:#1a1714;color:#fff;border:none;border-radius:11px;padding:13px 26px;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .1s,filter .15s;box-shadow:0 6px 16px rgba(26,23,20,.2);}
+  .dlBtn{background:#2a2636;color:#fff;border:none;border-radius:11px;padding:13px 26px;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .1s,filter .15s;box-shadow:0 6px 16px rgba(42,38,54,.2);}
   .dlBtn:hover{filter:brightness(1.18);}
   .dlBtn:active{transform:translateY(1px);}
   .dlBtn.busy{opacity:.6;pointer-events:none;}
 
   .postWrap{display:flex;justify-content:center;}
 
-  /* ----- 預覽卡 + 右側首頁格線參考並排 ----- */
+  /* ----- 預覽卡 + 右側九宮格並排 ----- */
   .stageRow{display:flex;align-items:flex-start;justify-content:center;gap:36px;flex-wrap:wrap;width:100%;}
-  .refCol{display:flex;flex-direction:column;gap:14px;width:264px;flex:none;}
+  .refCol{display:flex;flex-direction:column;gap:14px;width:232px;flex:none;}
 
-  /* ----- 貼文本體（C：emoji 大字 hero）｜尺寸用 em，靠 postInner 字級自動縮放 ----- */
-  .post{position:relative;overflow:hidden;border-radius:26px;background:var(--grad);
-    box-shadow:0 18px 48px rgba(26,23,20,.22);}
-  .postInner{width:100%;height:100%;display:flex;flex-direction:column;
-    padding:1.85em 1.72em;color:#1a1714;}
-  .bigEmoji{font-size:3.85em;line-height:1;align-self:flex-start;filter:drop-shadow(0 6px 12px rgba(0,0,0,.12));}
-  .ctag{align-self:flex-start;background:#fff;color:var(--tx);font-size:.81em;font-weight:800;letter-spacing:.02em;
-    padding:.4em .9em;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-top:.62em;}
-  .ph{font-size:1.9em;font-weight:900;line-height:1.2;letter-spacing:-0.02em;margin-top:.55em;color:#1a1714;white-space:pre-line;}
-  .ph em{font-style:normal;color:var(--tx);}
-  .pBody{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  /* =================================================================
+     版型：暖色實拍（刻意跟「手繪塗鴉版」走相反路線）
+     安靜、乾淨、照片主導、暖中性底、整齊系統字、一個主色。照片越真越好看。
+     ================================================================= */
+  .post{position:relative;overflow:hidden;border-radius:20px;background:#f1ebdd;
+    box-shadow:0 18px 46px rgba(45,38,28,.2);}
+  .postInner{width:100%;height:100%;display:flex;flex-direction:column;padding:1.35em 1.35em 0;color:#2a2420;}
+  .photoFrame{flex:none;background:#fffdf9;padding:.55em;border-radius:3px;
+    box-shadow:0 10px 24px rgba(45,38,28,.16);transform:rotate(-.8deg);}
+  .photoBox{height:0;padding-bottom:72%;position:relative;overflow:hidden;background:#e5dece;}
+  .photoBox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .photoEmpty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.55em;
+    background:repeating-linear-gradient(135deg,#ece4d4,#ece4d4 14px,#e7dece 14px,#e7dece 28px);
+    color:#a4977f;border:2px dashed #cabd9f;}
+  .photoEmpty svg{width:2.3em;height:2.3em;stroke:#a4977f;fill:none;stroke-width:1.4;}
+  .photoEmpty span{font-size:.78em;font-weight:700;letter-spacing:.04em;}
+  /* 文字區＝填字縮放用的 pBody */
+  .pBody{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:0 .5em;}
   .pBodyInner{display:flex;flex-direction:column;}
-  .plist{display:flex;flex-direction:column;gap:.56em;padding-top:1.05em;}
-  .prow{display:flex;gap:.69em;align-items:center;background:rgba(255,255,255,.62);
-    border:1px solid rgba(255,255,255,.85);border-radius:.88em;padding:.62em .75em;}
-  .prow .rpe{font-size:1.32em;flex:none;width:1.45em;text-align:center;}
-  .prow b{font-size:.94em;font-weight:800;color:#2a241d;line-height:1.25;}
-  .prow small{display:block;font-size:.75em;font-weight:500;color:#6f675b;margin-top:.12em;line-height:1.35;}
-  .pfoot{display:flex;justify-content:center;margin-top:1em;padding-top:.85em;
-    border-top:1px solid rgba(0,0,0,.1);}
-  .pfoot .handle{font-size:.78em;font-weight:700;letter-spacing:.06em;color:#756b62;}
+  .ctag{align-self:flex-start;color:var(--tx);font-weight:700;font-size:.72em;letter-spacing:.2em;margin-bottom:.55em;}
+  .ph{font-size:1.62em;font-weight:800;line-height:1.28;letter-spacing:-.015em;color:#2a2420;white-space:pre-line;}
+  .ph em{font-style:normal;color:var(--tx);}
+  .plist{display:flex;flex-direction:column;gap:.52em;padding-top:.85em;}
+  .prow{display:flex;gap:.55em;align-items:baseline;}
+  .prow .rpe{font-size:.98em;width:1.25em;flex:none;text-align:center;}
+  .prow b{font-size:.9em;font-weight:700;color:#332d27;line-height:1.3;}
+  .prow small{display:block;font-size:.76em;font-weight:400;color:#8a8070;margin-top:.04em;line-height:1.34;}
+  .pfoot{flex:none;display:flex;justify-content:flex-end;padding:0 .5em 1.25em;}
+  .pfoot .handle{font-size:.8em;font-weight:600;color:#9a9080;letter-spacing:.04em;}
 
-  /* ----- 首頁格線參考（IG 桌面版＝4 欄 4:5 直式） ----- */
+  /* ----- 九宮格參考 ----- */
   .gridRef{width:100%;}
-  .gridRefLbl{font-size:12px;color:#8a8270;text-align:left;margin-bottom:10px;line-height:1.4;}
-  .grid9{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;border-radius:10px;overflow:hidden;}
-  .gcell{aspect-ratio:4/5;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:5px;text-align:center;}
-  .gcell .ge{font-size:18px;line-height:1;}
-  .gcell .gt{font-size:8.5px;font-weight:900;line-height:1.12;}
+  .gridRefLbl{font-size:12px;color:#857c6a;text-align:left;margin-bottom:10px;line-height:1.4;}
+  .grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:12px;overflow:hidden;}
+  .gcell{aspect-ratio:1/1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;padding:8px;text-align:center;}
+  .gcell .ge{font-size:24px;line-height:1;}
+  .gcell .gt{font-size:10px;font-weight:900;line-height:1.12;}
 
-  .hint{font-size:11.5px;color:#9a9081;text-align:left;line-height:1.55;}
+  .hint{font-size:11.5px;color:#988f7c;text-align:left;line-height:1.55;}
 
   /* ===== 圖片／文案分流提示 ===== */
-  .capDivider{border:none;border-top:1px solid #ddd6c6;margin:28px 0 0;}
-  .capNote{font-size:12px;color:#7a5a36;background:#fff6ec;border:1px solid #f0dcc4;border-radius:10px;padding:10px 12px;line-height:1.55;margin:14px 0 12px;}
-  .capNote b{color:#c2541a;font-weight:800;}
+  .capDivider{border:none;border-top:1px solid #d8d1c0;margin:28px 0 0;}
+  .capNote{font-size:12px;color:#5a5063;background:#f3f0ff;border:1px solid #ddd6f0;border-radius:10px;padding:10px 12px;line-height:1.55;margin:14px 0 12px;}
+  .capNote b{color:#5a52c9;font-weight:800;}
   .liveTag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;color:#1f8f5f;background:#e6f6ec;border:1px solid #b9e3c8;border-radius:999px;padding:1px 8px;margin-left:7px;vertical-align:middle;}
 
-  /* ===== 手機：預覽在最上方、跟著頁面自然捲動（不釘住，避免網址列縮放讓比例跳動）===== */
+  /* ===== 手機：預覽在最上方、跟著頁面自然捲動 ===== */
   @media(max-width:900px){
     .app{display:flex;flex-direction:column;height:auto;}
     .panel{order:2;overflow-y:visible;}
-    .stage{order:1;overflow:visible;padding:16px 14px 22px;gap:14px;border-bottom:1px solid #d7d0c0;}
-    .stage .refCol{display:none;}                      /* 手機精簡：格線參考與提示移到桌機看 */
+    .stage{order:1;overflow:visible;padding:16px 14px 22px;gap:14px;border-bottom:1px solid #cfc8b8;}
+    .stage .refCol{display:none;}
     .dlBtn{padding:10px 20px;font-size:13px;border-radius:10px;}
   }
 </style>
@@ -132,8 +150,8 @@
 
   <!-- ========== 控制面板 ========== -->
   <aside class="panel">
-    <h1>IG 貼文產生器</h1>
-    <div class="sub">右昌 Apple Shop · emoji 大字風格。選支柱、填內容、匯出 PNG，文案自動產生。</div>
+    <h1>IG 貼文產生器 · 拍照記憶</h1>
+    <div class="sub">右昌 Apple Shop · 暖色實拍風格（安靜、照片主導，跟手繪塗鴉版相反路線）。上傳門市實拍最好看。</div>
 
     <div class="blk">
       <span class="lbl">內容支柱（自動切配色與預設）</span>
@@ -146,16 +164,25 @@
     </div>
 
     <div class="blk">
+      <span class="lbl">照片（拍立得裡那張）</span>
+      <div class="photoBtns">
+        <label class="btn ghost fileBtn">上傳照片<input type="file" id="photoFile" accept="image/*"></label>
+        <button class="btn ghost" id="photoAuto">用示意圖</button>
+      </div>
+      <div class="photoState" id="photoState"></div>
+    </div>
+
+    <div class="blk">
       <span class="lbl">比例</span>
       <div class="ratios" id="ratios">
-        <div class="rb on" data-r="45"><div class="rn">4:5</div><div class="rd">貼文首選</div></div>
+        <div class="rb on" data-r="45"><div class="rn">4:5</div><div class="rd">貼文主力</div></div>
         <div class="rb" data-r="916"><div class="rn">9:16</div><div class="rd">限動/Reels</div></div>
-        <div class="rb" data-r="11"><div class="rn">1:1</div><div class="rd">FB/商家</div></div>
+        <div class="rb" data-r="11"><div class="rn">1:1</div><div class="rd">方形</div></div>
       </div>
     </div>
 
     <div class="blk">
-      <span class="lbl">大 emoji</span>
+      <span class="lbl">便條紙標題用 emoji（文案開頭也會用到）</span>
       <input class="inp" id="bigE" maxlength="4" value="🎓">
       <div class="emojiQuick" id="emojiQuick"></div>
     </div>
@@ -165,7 +192,7 @@
       <textarea class="ta" id="headline" rows="2" placeholder="建議按 Enter 分成兩行，圖上更好讀">大專生買 Mac，
 能省多少？三招</textarea>
       <div style="margin-top:9px;">
-        <span class="fieldlbl">強調詞（會上主色，可留空）</span>
+        <span class="fieldlbl">強調詞（會上螢光筆，可留空）</span>
         <input class="inp" id="highlight" value="三招" placeholder="例：三招">
       </div>
     </div>
@@ -180,15 +207,14 @@
       <span class="lbl">門市資訊</span>
       <div class="row2">
         <input class="inp" id="store" value="Apple Shop 高雄右昌蘋果店">
-        <input class="inp" id="handle" value="@youchang027tk">
+        <input class="inp" id="handle" value="@youchang.apple">
       </div>
-      <input class="inp" id="addr" value="高雄市楠梓區德民路836號2樓" style="margin-top:9px;" placeholder="門市地址（會帶進文案）">
     </div>
 
     <hr class="capDivider">
     <div class="blk capArea">
       <span class="lbl">IG 文案（要貼到 IG 的文字 · 可編輯）</span>
-      <div class="capNote">這塊是<b>貼文文字</b>，跟右側圖片是分開的兩件事。<br>要改<b>圖片</b>內容，請回上面動「標題／強調詞／重點清單」（會即時反映到圖）；在這裡打字<b>不會改到圖片</b>。改完上面想同步文字，按「依上方重新產生」。</div>
+      <div class="capNote">這塊是<b>貼文文字</b>，跟右側圖片是分開的兩件事。<br>要改<b>圖片</b>內容，請回上面動「標題／強調詞／重點清單／照片」（會即時反映到圖）；在這裡打字<b>不會改到圖片</b>。改完上面想同步文字，按「依上方重新產生」。</div>
       <span class="fieldlbl">開場句型（換個勾人方式，避免每篇同模子）</span>
       <div class="pills" id="hooks" style="margin-bottom:11px;"></div>
       <span class="fieldlbl">Hashtag（可自己加減 · 之後可月更新）</span>
@@ -215,10 +241,10 @@
 
       <aside class="refCol">
         <div class="gridRef">
-          <div class="gridRefLbl">首頁格線整體感（IG 桌面版＝4 欄直式，6 支柱配色節奏）</div>
+          <div class="gridRefLbl">首頁九宮格整體感（5 支柱配色節奏）</div>
           <div class="grid9" id="grid9"></div>
         </div>
-        <div class="hint">小技巧：同一支柱用同一個色，9 篇排起來自然成套。文案結尾的「分享給朋友」是觸及非粉絲的關鍵（IG 最看重私訊分享數）。</div>
+        <div class="hint">小技巧：實拍照片越多真實感越強（店景、配件、貼膜過程都好）。文案結尾的「分享給朋友」是觸及非粉絲的關鍵（IG 最看重私訊分享數）。</div>
       </aside>
     </div>
   </main>
@@ -283,20 +309,12 @@ var PILLARS = {
             {e:'🛍️',t:'來右昌\n可以做哪些事？',hl:'哪些事',pts:[{e:'🔄',t:'舊換新估價',s:'現場報你聽'},{e:'🛡️',t:'貼膜服務',s:'無塵施工'},{e:'🎓',t:'教育價與分期',s:'方案都能問'}]},
             {e:'🤔',t:'還在想要不要\n升級？',hl:'要不要升級',pts:[{e:'📱',t:'現場比機',s:'實際拿在手上'},{e:'💬',t:'不推銷',s:'只幫你挑對的'},{e:'💳',t:'分期或舊換新',s:'預算更彈性'}]},
             {e:'📍',t:'楠梓想貼膜、\n買配件？',hl:'楠梓',pts:[{e:'🛡️',t:'保護貼施工',s:'無塵現場貼'},{e:'🛍️',t:'iPhone 配件',s:'實品看得到'},{e:'💬',t:'走過右昌',s:'進來問就對了'}]}
-          ]},
-  price: {name:'聰明入手', tx:'#0e7490', grad:'linear-gradient(155deg,#e1f4f9,#c8eaf2)',
-          emojis:['💡','🎓','🔄','💳','📱','🏷️'],
-          tags:'#教育價 #蘋果舊換新 #iPhone分期 #Mac #iPad #高雄Apple #右昌',
-          hooks:{ask:'Mac、iPad 想入手，怎麼買最划算？', pain:'想換電腦又怕預算爆掉？',
-                 num:'3 招把 Mac、iPad 總價壓下來。', time:'想要的容量，一次買足最省。', local:'高雄想省一點入手 Apple，來右昌幫你算。'},
-          topics:[
-            {e:'💡',t:'想換 Mac？\n三招先壓總價',hl:'三招',pts:[{e:'🎓',t:'教育價直接折',s:'學生與教職員專屬價'},{e:'🔄',t:'舊機折抵',s:'現場估價抵新機'},{e:'💳',t:'分期月付',s:'攤平更輕鬆'}]},
-            {e:'📱',t:'這幾樣\n價格照舊',hl:'價格照舊',pts:[{e:'📱',t:'iPhone 全系列',s:'價格沒動'},{e:'⌚',t:'Apple Watch',s:'價格沒動'},{e:'🎧',t:'AirPods',s:'價格沒動'}]},
-            {e:'🧩',t:'Mac、iPad\n容量怎麼選？',hl:'容量',pts:[{e:'🎬',t:'剪片修圖選大',s:'用很久一次到位'},{e:'📺',t:'看影片上網',s:'入門容量就夠'},{e:'💬',t:'不確定就問',s:'到店幫你抓'}]},
-            {e:'🔄',t:'舊機別生灰，\n折抵換新機',hl:'折抵',pts:[{e:'📱',t:'手機平板電腦',s:'都能估'},{e:'💰',t:'當場知道折多少',s:'現場估價'},{e:'✅',t:'折完再換',s:'門檻更低'}]}
           ]}
 };
-var PILLAR_ORDER = ['save','class','acc','film','daily','price'];
+var PILLAR_ORDER = ['save','class','acc','film','daily'];
+
+/* ---------- 拍照記憶：示意圖種子（沒上傳實拍時的暫代圖，靠種子取得穩定的相關照片） ---------- */
+var PHOTO_SEED = {save:'mac-apple-store-desk', class:'iphone-photo-album', acc:'tech-accessories-flatlay', film:'smartphone-screen-macro', daily:'apple-retail-shop'};
 
 /* ---------- 比例尺寸（顯示寬度；匯出固定 1080 寬） ---------- */
 var RATIOS = { '45':{w:480,h:600,base:20}, '916':{w:420,h:746,base:20}, '11':{w:500,h:500,base:20} };
@@ -305,18 +323,32 @@ var RATIOS = { '45':{w:480,h:600,base:20}, '916':{w:420,h:746,base:20}, '11':{w:
 var state = {
   pillar:'save', ratio:'45', topicIdx:0, hookStyle:'ask',
   big:'🎓', headline:'大專生買 Mac，\n能省多少？三招', highlight:'三招',
-  points:[], store:'Apple Shop 高雄右昌蘋果店', handle:'@youchang027tk', addr:'高雄市楠梓區德民路836號2樓', tags:''
+  points:[], store:'Apple Shop 高雄右昌蘋果店', handle:'@youchang.apple', tags:'',
+  photoMode:'empty', photoData:''
 };
 
 /* ---------- 工具 ---------- */
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function $(id){return document.getElementById(id);}
+function hexToRgba(hex,a){var h=hex.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];var n=parseInt(h,16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+function getPhotoUrl(){
+  if(state.photoMode==='custom' && state.photoData) return state.photoData;
+  var seed='yc-'+(PHOTO_SEED[state.pillar]||'apple')+'-'+state.topicIdx;
+  return 'https://picsum.photos/seed/'+encodeURIComponent(seed)+'/900/900';
+}
+function renderPhotoState(){
+  var el=$('photoState'); if(!el) return;
+  if(state.photoMode==='custom') el.innerHTML='目前：<b>你上傳的實拍照</b>。最有記憶感。';
+  else if(state.photoMode==='auto') el.innerHTML='目前：<b>隨機示意圖</b>（picsum，跟 Apple 主題無關，只供排版預覽）。建議改上傳實拍。';
+  else el.innerHTML='目前：<b>空相框</b>。按「上傳照片」放門市實拍，整張才會活起來。';
+}
 
-/* ---------- 渲染貼文 ---------- */
+/* ---------- 渲染貼文（拍照記憶） ---------- */
 function renderPost(){
   var p = PILLARS[state.pillar];
   document.documentElement.style.setProperty('--tx', p.tx);
   document.documentElement.style.setProperty('--grad', p.grad);
+  document.documentElement.style.setProperty('--mk', hexToRgba(p.tx,.24));
 
   var hl = esc(state.headline);
   if(state.highlight.trim()){
@@ -332,9 +364,8 @@ function renderPost(){
   var post = $('post');
   var r = RATIOS[state.ratio];
   post.style.aspectRatio = r.w+' / '+r.h;
-  post.style.height = 'auto';                 // 高度一律由 aspect-ratio 決定
+  post.style.height = 'auto';
   if(window.innerWidth<=900){
-    // 手機：以螢幕寬為準（寬度不隨網址列縮放跳動），高度由 aspect-ratio 決定，跟著頁面自然捲動
     var w = Math.min(window.innerWidth*0.86, 440);
     post.style.width = w+'px';
     post.style.maxWidth = '92vw';
@@ -342,11 +373,15 @@ function renderPost(){
     post.style.width = r.w+'px';
     post.style.maxWidth = '100%';
   }
+  var photoInner = (state.photoMode==='empty')
+    ? '<div class="photoEmpty"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.5" width="18" height="13.5" rx="2.5"/><circle cx="12" cy="13.5" r="3.4"/><path d="M8 6.5 L9.4 4 H14.6 L16 6.5"/></svg><span>上傳門市照片</span></div>'
+    : '<img id="pphoto" crossorigin="anonymous" alt="" src="'+getPhotoUrl()+'">';
+
   post.innerHTML =
     '<div class="postInner" id="postInner">'+
+      '<div class="photoFrame"><div class="photoBox">'+photoInner+'</div></div>'+
       '<div class="pBody" id="pBody">'+
         '<div class="pBodyInner" id="pBodyInner">'+
-          '<span class="bigEmoji">'+esc(state.big)+'</span>'+
           '<span class="ctag">'+esc(p.name)+'</span>'+
           '<h2 class="ph">'+hl+'</h2>'+
           '<div class="plist">'+rows+'</div>'+
@@ -357,21 +392,21 @@ function renderPost(){
   fitPost();
 }
 
-/* ---------- 自動填滿：字級放大填滿版面、太多則縮小，永遠不被切（9:16 不再小而稀疏） ---------- */
+/* ---------- 字級縮放：雜誌風刻意不填滿，留白優先（max 較低） ---------- */
 function fitPost(){
   var inner=$('postInner'), body=$('pBody'), content=$('pBodyInner');
   if(!inner||!body||!content) return;
-  var min=RATIOS[state.ratio].base, max=min*1.6, size=min;
+  var min=RATIOS[state.ratio].base, max=min*1.32, size=min;
   inner.style.fontSize=size+'px';
   for(var i=0;i<24;i++){
     var avail=body.clientHeight*0.95, nat=content.offsetHeight;
     if(nat<=0) break;
     var r=avail/nat;
-    if(r>0.99 && r<1.03) break;            // 已接近填滿
+    if(r>0.99 && r<1.03) break;
     size=size*r;
     if(size>max) size=max;
     inner.style.fontSize=size+'px';
-    if(size>=max && r>1) break;            // 達上限仍想放大 → 停（保留留白）
+    if(size>=max && r>1) break;
   }
 }
 
@@ -408,7 +443,6 @@ function buildCaption(){
   }).join('\n');
   return state.big+' '+hook+'\n\n'+body+
     '\n\n📍 '+state.store+
-    (state.addr&&state.addr.trim()?'\n🗺️ '+state.addr:'')+
     '\n💬 想升級或有問題？私訊我們，或直接來店問'+
     '\n👀 覺得實用，分享給需要的朋友！'+
     '\n\n'+(state.tags||p.tags);
@@ -439,20 +473,18 @@ function updateUndoBtn(){
 function loadPillar(key){
   state.pillar = key;
   var p = PILLARS[key];
-  // 高亮選中支柱
   Array.prototype.forEach.call(document.querySelectorAll('#pillars .pill'),function(el){
     var on = el.dataset.k===key;
     el.classList.toggle('on', on);
     el.style.background = on ? p.tx : '';
   });
-  // hashtag 預設（可被使用者覆寫）
   state.tags = p.tags;
   $('tags').value = p.tags;
   renderTopicSel();
   renderHooks();
   renderEmojiQuick();
   renderGrid9();
-  loadTopic(0);   // 預設載入第一組主題
+  loadTopic(0);
 }
 
 /* ---------- 載入主題（同支柱可換） ---------- */
@@ -505,11 +537,12 @@ function renderEmojiQuick(){
   });
 }
 
-/* ---------- 首頁格線參考（4 欄 4:5，8 格＝2 列×4，無空格） ---------- */
+/* ---------- 九宮格參考 ---------- */
 function renderGrid9(){
   var cells=[
-    {k:'save', e:'🎓', t:'教育價'},{k:'film', e:'🛡️', t:'保護貼'},{k:'acc', e:'🔋', t:'行動電源'},{k:'class', e:'📸', t:'照片整理'},
-    {k:'price', e:'💡', t:'聰明入手'},{k:'daily', e:'🍎', t:'門市日常'},{k:'acc', e:'🎧', t:'AirPods'},{k:'class', e:'☁️', t:'iCloud'}
+    {k:'save', e:'🎓', t:'教育價'},{k:'class', e:'📸', t:'照片整理'},{k:'acc', e:'🔋', t:'電源挑選'},
+    {k:'film', e:'🛡️', t:'保護貼'},{k:'save', e:'💰', t:'舊換新'},{k:'daily', e:'🍎', t:'門市日常'},
+    {k:'class', e:'☁️', t:'iCloud'},{k:'acc', e:'🎧', t:'AirPods'},{k:'film', e:'✨', t:'霧或亮'}
   ];
   $('grid9').innerHTML = cells.map(function(c){
     var p=PILLARS[c.k];
@@ -528,19 +561,18 @@ function download(){
       var a=document.createElement('a');
       var d=new Date();
       var stamp=d.getFullYear()+''+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
-      a.download='IG_'+PILLARS[state.pillar].name+'_'+state.ratio+'_'+stamp+'.png';
+      a.download='IG_拍照_'+PILLARS[state.pillar].name+'_'+state.ratio+'_'+stamp+'.png';
       a.href=url; a.click();
       btn.classList.remove('busy'); btn.textContent=old;
     })
     .catch(function(err){
       btn.classList.remove('busy'); btn.textContent=old;
-      alert('匯出失敗，請確認有連上網路（下載元件需要）。\n'+err);
+      alert('匯出失敗。若用「示意圖」可能是網路或跨來源限制，建議改「上傳照片」用自己的實拍最穩。\n'+err);
     });
 }
 
 /* ---------- 綁定 ---------- */
 function bind(){
-  // 支柱按鈕
   var pc=$('pillars');
   PILLAR_ORDER.forEach(function(k){
     var p=PILLARS[k];
@@ -549,29 +581,32 @@ function bind(){
     b.addEventListener('click',function(){ loadPillar(k); });
     pc.appendChild(b);
   });
-  // 主題下拉
   $('topicSel').addEventListener('change',function(){ loadTopic(parseInt(this.value,10)); });
-  // 比例
   Array.prototype.forEach.call(document.querySelectorAll('#ratios .rb'),function(el){
     el.addEventListener('click',function(){
       Array.prototype.forEach.call(document.querySelectorAll('#ratios .rb'),function(x){x.classList.remove('on');});
       el.classList.add('on'); state.ratio=el.dataset.r; renderPost();
     });
   });
-  // 欄位
+  // 照片：上傳實拍 / 用示意圖
+  $('photoFile').addEventListener('change',function(){
+    var f=this.files && this.files[0]; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){ state.photoMode='custom'; state.photoData=rd.result; renderPhotoState(); renderPost(); };
+    rd.readAsDataURL(f);
+  });
+  $('photoAuto').addEventListener('click',function(){ state.photoMode='auto'; state.photoData=''; $('photoFile').value=''; renderPhotoState(); renderPost(); });
   $('bigE').addEventListener('input',function(){state.big=this.value;renderPost();});
   $('headline').addEventListener('input',function(){state.headline=this.value;renderPost();});
   $('highlight').addEventListener('input',function(){state.highlight=this.value;renderPost();});
   $('store').addEventListener('input',function(){state.store=this.value;renderPost();});
   $('handle').addEventListener('input',function(){state.handle=this.value;renderPost();});
-  $('addr').addEventListener('input',function(){state.addr=this.value;});
   $('tags').addEventListener('input',function(){state.tags=this.value;});
   $('addPoint').addEventListener('click',function(){
     if(state.points.length<4){state.points.push({e:'✨',t:'',s:''});renderPoints();renderPost();}
   });
   $('regenCap').addEventListener('click',regenCaption);
   $('undoCap').addEventListener('click',undoCap);
-  // 文案編輯：聚焦先記一筆、停手 0.6 秒記一筆，供「復原」一步步退回
   $('caption').addEventListener('focus',snapCap);
   $('caption').addEventListener('input',function(){
     clearTimeout(capTimer);
@@ -588,6 +623,7 @@ function bind(){
 
 /* ---------- 啟動 ---------- */
 bind();
+renderPhotoState();
 loadPillar('save');
 var fitTimer=null;
 window.addEventListener('resize',function(){ clearTimeout(fitTimer); fitTimer=setTimeout(renderPost,150); });
